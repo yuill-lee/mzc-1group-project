@@ -10,7 +10,7 @@ module "instance" {
     public-subnet-1-id = module.network.public-subnet-1-id
     bastion-sg-id = module.network.bastion-sg-id
     nat-sg-id = module.network.nat-sg-id
-
+    
     private-subnet-1-id = module.network.private_subnet_1_id 
     private-subnet-2-id = module.network.private_subnet_2_id
   

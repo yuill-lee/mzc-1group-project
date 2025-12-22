@@ -12,7 +12,6 @@ resource "aws_instance" "bastion-server" {
     }
 }
 # -------------------- Bastion Server -------------------- #
-
 # -------------------- NAT Server -------------------- #
 resource "aws_instance" "nat-server" {
     instance_type = "t3.micro"
