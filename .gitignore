@@ -1,0 +1,13 @@
+# .gitignore
+
+# 1. 테라폼 설정 폴더
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+
+# 2. 민감한 정보 파일
+*.tfvars
+*.auto.tfvars
+
+# 3. 기타 시스템 파일
+.DS_Store
