@@ -1,0 +1,1 @@
+variable "nat-instance-eni-id" { type = string }
