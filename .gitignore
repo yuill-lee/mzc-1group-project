@@ -1,6 +1,7 @@
 # .gitignore
-
+.terraform/
 # 1. 테라폼 설정 폴더
+
 **/.terraform/
 *.tfstate
 *.tfstate.backup
