@@ -168,6 +168,23 @@ resource "aws_security_group" "alb-sg"{
     }
 }
 
+resource "aws_security_group" "public-alb-sg"{
+    vpc_id = aws_vpc.vpc.id
+    name = "Public-ALB-SG"
+
+    tags = {
+        Name = "Public-ALB-SG"
+    }
+}
+
+resource "aws_security_group" "internal-alb-sg"{
+    vpc_id = aws_vpc.vpc.id
+    name = "Internal-ALB-SG"
+
+    tags = {
+        Name = "Internal-ALB-SG"
+    }
+}
 resource "aws_vpc_security_group_ingress_rule" "web-ingress-allow-http" {
     security_group_id = aws_security_group.web-sg.id
     cidr_ipv4 = "0.0.0.0/0"
@@ -306,6 +323,42 @@ resource "aws_vpc_security_group_ingress_rule" "alb-ingress-allow-https" {
 
 resource "aws_vpc_security_group_egress_rule" "alb-egress-allow-all" {
     security_group_id = aws_security_group.alb-sg.id
+    cidr_ipv4 = "0.0.0.0/0"
+    ip_protocol = "-1"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "public-alb-ingress-allow-http" {
+    security_group_id = aws_security_group.public-alb-sg.id
+    cidr_ipv4 = "0.0.0.0/0"
+    from_port = 80
+    to_port = 80
+    ip_protocol = "tcp"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "public-alb-ingress-allow-https" {
+    security_group_id = aws_security_group.public-alb-sg.id
+    cidr_ipv4 = "0.0.0.0/0"
+    from_port = 443
+    to_port = 443
+    ip_protocol = "tcp"
+}
+
+resource "aws_vpc_security_group_egress_rule" "public-alb-egress-allow-all" {
+    security_group_id = aws_security_group.public-alb-sg.id
+    cidr_ipv4 = "0.0.0.0/0"
+    ip_protocol = "-1"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "internal-alb-ingress-allow-php" {
+    security_group_id = aws_security_group.internal-alb-sg.id
+    cidr_ipv4 = aws_vpc.vpc.cidr_block
+    from_port = 9000
+    to_port = 9000
+    ip_protocol = "tcp"
+}
+
+resource "aws_vpc_security_group_egress_rule" "internal-alb-egress-allow-all" {
+    security_group_id = aws_security_group.internal-alb-sg.id
     cidr_ipv4 = "0.0.0.0/0"
     ip_protocol = "-1"
 }

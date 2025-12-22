@@ -64,6 +64,18 @@ resource "aws_instance" "web-2" {
     }
 }
 
+resource "aws_lb_target_group_attachment" "web_1_attachment" {
+  target_group_arn = var.public_alb_target_group_arn  # ALB 타겟 그룹 주소
+  target_id       = aws_instance.web-1.id       # 방금 만든 WEB 인스턴스 ID
+  port             = 80
+}
+
+resource "aws_lb_target_group_attachment" "web_2_attachment" {
+  target_group_arn = var.public_alb_target_group_arn  # ALB 타겟 그룹 주소
+  target_id       = aws_instance.web-2.id       # 방금 만든 WEB 인스턴스 ID
+  port             = 80
+}
+
 # -------------------- WEB ALB / Target Group -------------------- #
 
 # -------------------- WAS ALB / Target Group -------------------- #
@@ -98,6 +110,18 @@ resource "aws_instance" "was-2" {
     tags = {
         Name = "WAS-Server-2"
     }
+}
+
+resource "aws_lb_target_group_attachment" "was_1_attachment" {
+  target_group_arn = var.internal_alb_target_group_arn  # ALB 타겟 그룹 주소
+  target_id       = aws_instance.was-1.id       # 방금 만든 WEB 인스턴스 ID
+  port             = 80
+}
+
+resource "aws_lb_target_group_attachment" "was_2_attachment" {
+  target_group_arn = var.internal_alb_target_group_arn  # ALB 타겟 그룹 주소
+  target_id       = aws_instance.was-2.id       # 방금 만든 WEB 인스턴스 ID
+  port             = 80
 }
 
 # -------------------- WAS ALB / Target Group -------------------- #

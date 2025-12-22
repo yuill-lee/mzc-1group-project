@@ -11,22 +11,25 @@ module "instance" {
     bastion-sg-id = module.network.bastion-sg-id
     nat-sg-id = module.network.nat-sg-id
     
-    private-subnet-1-id = module.network.private_subnet_1_id 
-    private-subnet-2-id = module.network.private_subnet_2_id
+    private-subnet-1-id = module.network.private-subnet-1-id 
+    private-subnet-2-id = module.network.private-subnet-2-id
   
-  web-sg-id           = module.network.web_sg_id
-  was-sg-id           = module.network.was_sg_id
+    web-sg-id           = module.network.web-sg-id
+    was-sg-id           = module.network.was-sg-id
+
+    public_alb_target_group_arn  = module.alb_system.public_alb_target_group_arn
+    internal_alb_target_group_arn  = module.alb_system.internal_alb_target_group_arn
 }
 
 module "rds_database" {
   source = "./Database"
 
   subnet_ids = [
-    module.network.private-subnet-1.id,
-    module.network.private-subnet-2.id
+    module.network.private-subnet-1-id,
+    module.network.private-subnet-2-id
   ]
 
-  db_sg_id = module.network.db-sg.id
+  db_sg_id = module.network.db-sg-id
 }
 
 module "sub_region" {
@@ -42,17 +45,20 @@ module "sub_region" {
 module "alb_system" {
   source = "./alb"
 
-  vpc_id          = module.network.vpc_id
-  public_subnets  = module.network.public_subnet_ids  
-  private_subnets = module.network.private_subnet_ids 
+  vpc_id          = module.network.vpc-id
+  public_subnets = [
+    module.network.public-subnet-1-id,
+    module.network.public-subnet-2-id 
+  ]
+
+  private_subnets = [
+    module.network.private-subnet-1-id,
+    module.network.private-subnet-2-id 
+  ]
 
   public_alb_sg_id   = module.network.public_alb_sg_id
   internal_alb_sg_id = module.network.internal_alb_sg_id
 
   web_instance_ids = module.instance.web_instance_ids
   was_instance_ids = module.instance.was_instance_ids
-}
-
-output "website_url" {
-  value = "http://${module.alb_system.public_alb_dns}"
 }

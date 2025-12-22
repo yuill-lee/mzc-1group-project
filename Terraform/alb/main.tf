@@ -11,7 +11,7 @@ resource "aws_lb" "public_alb" {
   tags = { Name = "Public-ALB" }
 }
 
-resource "aws_lb_target_group" "web_tg" {
+resource "aws_lb_target_group" "public_alb_target_group" {
   name     = "web-target-group"
   port     = 80
   protocol = "HTTP"
@@ -26,14 +26,14 @@ resource "aws_lb_listener" "public_listener" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.web_tg.arn
+    target_group_arn = aws_lb_target_group.public_alb_target_group.arn
   }
 }
 
 # WEB 인스턴스 연결
 resource "aws_lb_target_group_attachment" "web_attach" {
   count            = length(var.web_instance_ids)
-  target_group_arn = aws_lb_target_group.web_tg.arn
+  target_group_arn = aws_lb_target_group.public_alb_target_group.arn
   target_id        = var.web_instance_ids[count.index]
   port             = 80
 }
@@ -42,8 +42,8 @@ resource "aws_lb_target_group_attachment" "web_attach" {
 # 2. Internal Load Balancer (WEB -> WAS)
 # ============================================================
 resource "aws_lb" "internal_alb" {
-  name               = "internal-alb"
-  internal           = true   # ★ 내부 전용 (Private Subnet에 배치)
+  name               = "Internal-ALB"
+  internal           = true   # ★) 내부 전용 (Private Subnet에 배치
   load_balancer_type = "application"
   security_groups    = [var.internal_alb_sg_id]
   subnets            = var.private_subnets # ★ Private Subnet 사용
@@ -51,7 +51,8 @@ resource "aws_lb" "internal_alb" {
   tags = { Name = "Internal-ALB" }
 }
 
-resource "aws_lb_target_group" "was_tg" {
+
+resource "aws_lb_target_group" "internal_alb_target_group" {
   name     = "was-target-group"
   port     = 8080   # ★ WAS 애플리케이션 포트 (Tomcat:8080, Node:3000 등)
   protocol = "HTTP"
@@ -66,14 +67,15 @@ resource "aws_lb_listener" "internal_listener" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.was_tg.arn
+    target_group_arn = aws_lb_target_group.internal_alb_target_group.arn
   }
 }
 
 # WAS 인스턴스 연결
 resource "aws_lb_target_group_attachment" "was_attach" {
   count            = length(var.was_instance_ids)
-  target_group_arn = aws_lb_target_group.was_tg.arn
+  target_group_arn = aws_lb_target_group.internal_alb_target_group.arn
   target_id        = var.was_instance_ids[count.index]
   port             = 8080 # ★ WAS 포트와 일치해야 함
 }
+
