@@ -1,1 +1,1 @@
-variable "nat-instance-eni-id" { type = string }
+variable "nat_instance_eni_id" { type = string }
