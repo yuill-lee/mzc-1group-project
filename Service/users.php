@@ -26,9 +26,9 @@
 					?>
 					<tr>
 		<td><?php echo $userss['id']?></td>
-		<td><?php echo $userss['user_name']?></td>
-		<td><?php echo $userss['password']?></td>
 		<td><?php echo $userss['name']?></td>
+		<td><?php echo $userss['email']?></td>
+		<td><?php echo $userss['password']?></td>
 
 
 						<td><a href="edit-users.php?act=edit&id=<?php echo $userss['id']?>"><i class="glyphicon glyphicon-edit"></i></a></td>

@@ -1,10 +1,10 @@
 # -------------------- Bastion Server -------------------- #
-resource "aws_instance" "bastion-server" {
+resource "aws_instance" "bastion_server" {
     instance_type = "t3.micro"
-    ami = var.ubuntu-ami-seoul
+    ami = var.ubuntu_ami_seoul
     key_name = "Final-Project-Key"
-    subnet_id = var.public-subnet-1-id
-    vpc_security_group_ids = [var.bastion-sg-id]
+    subnet_id = var.public_subnet_1_id
+    vpc_security_group_ids = [var.bastion_sg_id]
     associate_public_ip_address = true
 
     tags = {
@@ -13,12 +13,12 @@ resource "aws_instance" "bastion-server" {
 }
 # -------------------- Bastion Server -------------------- #
 # -------------------- NAT Server -------------------- #
-resource "aws_instance" "nat-server" {
+resource "aws_instance" "nat_server" {
     instance_type = "t3.micro"
-    ami = var.amazon-linux-2-ami-seoul
+    ami = var.amazon_linux_2_ami_seoul
     key_name = "Final-Project-Key"
-    subnet_id = var.public-subnet-1-id
-    vpc_security_group_ids = [var.nat-sg-id]
+    subnet_id = var.public_subnet_1_id
+    vpc_security_group_ids = [var.nat_sg_id]
     source_dest_check = false
 
     tags = {
@@ -30,15 +30,15 @@ resource "aws_instance" "nat-server" {
 # -------------------- WEB ALB / Target Group -------------------- #
 
 # 1. Web Servers
-resource "aws_instance" "web-1" {
+resource "aws_instance" "web_1" {
     instance_type = "t3.micro"
-    ami           = var.amazon-linux-2-ami-seoul
+    ami           = var.amazon_linux_2_ami_seoul
     key_name      = "Final-Project-Key"
     
     # 1번 서버는 1번 프라이빗 서브넷에 배치
-    subnet_id     = var.private-subnet-1-id  
+    subnet_id     = var.private_subnet_1_id  
     
-    vpc_security_group_ids = [var.web-sg-id]
+    vpc_security_group_ids = [var.web_sg_id]
 
     # (선택사항) 나중에 Nginx 자동 설치 스크립트 넣을 곳
     # user_data = file("${path.module}/web_init.sh")
@@ -49,19 +49,31 @@ resource "aws_instance" "web-1" {
 }
 
 # 2. Web Servers
-resource "aws_instance" "web-2" {
+resource "aws_instance" "web_2" {
     instance_type = "t3.micro"
-    ami           = var.amazon-linux-2-ami-seoul
+    ami           = var.amazon_linux_2_ami_seoul
     key_name      = "Final-Project-Key"
     
     # 2번 서버는 2번 프라이빗 서브넷에 배치 (이중화)
-    subnet_id     = var.private-subnet-2-id
+    subnet_id     = var.private_subnet_2_id
     
-    vpc_security_group_ids = [var.web-sg-id]
+    vpc_security_group_ids = [var.web_sg_id]
 
     tags = {
         Name = "WEB-Server-2"
     }
+}
+
+resource "aws_lb_target_group_attachment" "web_1_attachment" {
+  target_group_arn = var.public_alb_target_group_arn  # ALB 타겟 그룹 주소
+  target_id       = aws_instance.web_1.id       # 방금 만든 WEB 인스턴스 ID
+  port             = 80
+}
+
+resource "aws_lb_target_group_attachment" "web_2_attachment" {
+  target_group_arn = var.public_alb_target_group_arn  # ALB 타겟 그룹 주소
+  target_id       = aws_instance.web_2.id       # 방금 만든 WEB 인스턴스 ID
+  port             = 80
 }
 
 # -------------------- WEB ALB / Target Group -------------------- #
@@ -69,15 +81,15 @@ resource "aws_instance" "web-2" {
 # -------------------- WAS ALB / Target Group -------------------- #
 
 # 1. WAS Servers
-resource "aws_instance" "was-1" {
+resource "aws_instance" "was_1" {
     instance_type = "t3.micro"
-    ami           = var.amazon-linux-2-ami-seoul
+    ami           = var.amazon_linux_2_ami_seoul
     key_name      = "Final-Project-Key"
     
     # 1번 WAS는 1번 프라이빗 서브넷에 배치
-    subnet_id     = var.private-subnet-1-id
+    subnet_id     = var.private_subnet_1_id
     
-    vpc_security_group_ids = [var.was-sg-id]
+    vpc_security_group_ids = [var.was_sg_id]
 
     tags = {
         Name = "WAS-Server-1"
@@ -85,19 +97,31 @@ resource "aws_instance" "was-1" {
 }
 
 # 2. WAS Servers
-resource "aws_instance" "was-2" {
+resource "aws_instance" "was_2" {
     instance_type = "t3.micro"
-    ami           = var.amazon-linux-2-ami-seoul
+    ami           = var.amazon_linux_2_ami_seoul
     key_name      = "Final-Project-Key"
     
     # 2번 WAS는 2번 프라이빗 서브넷에 배치
-    subnet_id     = var.private-subnet-2-id
+    subnet_id     = var.private_subnet_2_id
     
-    vpc_security_group_ids = [var.was-sg-id]
+    vpc_security_group_ids = [var.was_sg_id]
 
     tags = {
         Name = "WAS-Server-2"
     }
+}
+
+resource "aws_lb_target_group_attachment" "was_1_attachment" {
+  target_group_arn = var.internal_alb_target_group_arn  # ALB 타겟 그룹 주소
+  target_id       = aws_instance.was_1.id       # 방금 만든 WEB 인스턴스 ID
+  port             = 80
+}
+
+resource "aws_lb_target_group_attachment" "was_2_attachment" {
+  target_group_arn = var.internal_alb_target_group_arn  # ALB 타겟 그룹 주소
+  target_id       = aws_instance.was_2.id       # 방금 만든 WEB 인스턴스 ID
+  port             = 80
 }
 
 # -------------------- WAS ALB / Target Group -------------------- #
