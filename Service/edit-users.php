@@ -17,7 +17,7 @@
 						<input name="act" type="hidden" value="<?=$act?>">
 				
 							<label>User name</label>
-							<input class="form-control" type="text" name="user_name" value="<?=$users['user_name']?>" /><br>
+							<input class="form-control" type="text" name="user_name" value="<?=$users['name']?>" /><br>
 							
 							<label>Password</label>
 							<input class="form-control" type="text" name="password" value="<?=$users['password']?>" /><br>
