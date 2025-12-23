@@ -20,6 +20,8 @@ resource "aws_instance" "nat_server" {
     subnet_id = var.public_subnet_1_id
     vpc_security_group_ids = [var.nat_sg_id]
     source_dest_check = false
+    associate_public_ip_address = true
+    user_data = file("${path.module}/userdata/nat.sh")
 
     tags = {
         Name = "NAT-Server"
@@ -32,17 +34,18 @@ resource "aws_instance" "nat_server" {
 # 1. Web Servers
 resource "aws_instance" "web_1" {
     instance_type = "t3.micro"
-    ami           = var.amazon_linux_2_ami_seoul
+    ami           = var.ubuntu_ami_seoul
     key_name      = "Final-Project-Key"
     
     # 1번 서버는 1번 프라이빗 서브넷에 배치
-    subnet_id     = var.private_subnet_1_id  
-    
+    subnet_id     = var.public_subnet_1_id  
     vpc_security_group_ids = [var.web_sg_id]
-
-    # (선택사항) 나중에 Nginx 자동 설치 스크립트 넣을 곳
-    # user_data = file("${path.module}/web_init.sh")
-
+    associate_public_ip_address = true
+    user_data = templatefile(
+        "${path.module}/userdata/web.tpl", {
+            WAS_IP = aws_instance.was_1.private_ip
+        }
+    )
     tags = {
         Name = "WEB-Server-1"
     }
@@ -51,13 +54,18 @@ resource "aws_instance" "web_1" {
 # 2. Web Servers
 resource "aws_instance" "web_2" {
     instance_type = "t3.micro"
-    ami           = var.amazon_linux_2_ami_seoul
+    ami           = var.ubuntu_ami_seoul
     key_name      = "Final-Project-Key"
     
     # 2번 서버는 2번 프라이빗 서브넷에 배치 (이중화)
-    subnet_id     = var.private_subnet_2_id
-    
+    subnet_id     = var.public_subnet_2_id
     vpc_security_group_ids = [var.web_sg_id]
+    associate_public_ip_address = true
+    user_data = templatefile(
+        "${path.module}/userdata/web.tpl", {
+            WAS_IP = aws_instance.was_1.private_ip
+        }
+    )
 
     tags = {
         Name = "WEB-Server-2"
@@ -83,13 +91,13 @@ resource "aws_lb_target_group_attachment" "web_2_attachment" {
 # 1. WAS Servers
 resource "aws_instance" "was_1" {
     instance_type = "t3.micro"
-    ami           = var.amazon_linux_2_ami_seoul
+    ami           = var.ubuntu_ami_seoul
     key_name      = "Final-Project-Key"
     
     # 1번 WAS는 1번 프라이빗 서브넷에 배치
     subnet_id     = var.private_subnet_1_id
-    
     vpc_security_group_ids = [var.was_sg_id]
+    user_data = file("${path.module}/userdata/was.sh")
 
     tags = {
         Name = "WAS-Server-1"
@@ -99,13 +107,13 @@ resource "aws_instance" "was_1" {
 # 2. WAS Servers
 resource "aws_instance" "was_2" {
     instance_type = "t3.micro"
-    ami           = var.amazon_linux_2_ami_seoul
+    ami           = var.ubuntu_ami_seoul
     key_name      = "Final-Project-Key"
     
     # 2번 WAS는 2번 프라이빗 서브넷에 배치
     subnet_id     = var.private_subnet_2_id
-    
     vpc_security_group_ids = [var.was_sg_id]
+    user_data = file("${path.module}/userdata/was.sh")
 
     tags = {
         Name = "WAS-Server-2"

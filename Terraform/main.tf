@@ -8,6 +8,7 @@ module "instance" {
     source = "./instance"
 
     public_subnet_1_id = module.network.public_subnet_1_id
+    public_subnet_2_id = module.network.public_subnet_2_id
     bastion_sg_id = module.network.bastion_sg_id
     nat_sg_id = module.network.nat_sg_id
     
@@ -21,7 +22,7 @@ module "instance" {
     internal_alb_target_group_arn  = module.alb_system.internal_alb_target_group_arn
 }
 
-module "rds_database" {
+/*module "rds_database" {
   source = "./Database"
 
   subnet_ids = [
@@ -40,7 +41,7 @@ module "sub_region" {
   }
 
   seoul_db_arn = module.rds_database.rds_arn
-}
+}*/
 
 module "alb_system" {
   source = "./alb"
