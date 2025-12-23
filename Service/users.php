@@ -26,7 +26,7 @@
 					?>
 					<tr>
 		<td><?php echo $userss['id']?></td>
-		<td><?php echo $userss['user_name']?></td>
+		<td><?php echo $userss['name']?></td>
 		<td><?php echo $userss['password']?></td>
 		<td><?php echo $userss['name']?></td>
 
