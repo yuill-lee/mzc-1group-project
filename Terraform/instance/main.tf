@@ -43,7 +43,7 @@ resource "aws_instance" "web_1" {
     associate_public_ip_address = true
     user_data = templatefile(
         "${path.module}/userdata/web.tpl", {
-            WAS_IP = aws_instance.was_1.private_ip
+            WAS_IP = var.internal_nlb_dns
         }
     )
     tags = {
@@ -63,7 +63,7 @@ resource "aws_instance" "web_2" {
     associate_public_ip_address = true
     user_data = templatefile(
         "${path.module}/userdata/web.tpl", {
-            WAS_IP = aws_instance.was_1.private_ip
+            WAS_IP = var.internal_nlb_dns
         }
     )
 
@@ -120,16 +120,17 @@ resource "aws_instance" "was_2" {
     }
 }
 
+
 resource "aws_lb_target_group_attachment" "was_1_attachment" {
-  target_group_arn = var.internal_alb_target_group_arn  # ALB 타겟 그룹 주소
-  target_id       = aws_instance.was_1.id       # 방금 만든 WEB 인스턴스 ID
-  port             = 80
+  target_group_arn = var.internal_nlb_target_group_arn  # NLB 타겟 그룹 주소
+  target_id       = aws_instance.was_1.id       # 방금 만든 WAS 인스턴스 ID
+  port             = 9000
 }
 
 resource "aws_lb_target_group_attachment" "was_2_attachment" {
-  target_group_arn = var.internal_alb_target_group_arn  # ALB 타겟 그룹 주소
-  target_id       = aws_instance.was_2.id       # 방금 만든 WEB 인스턴스 ID
-  port             = 80
+  target_group_arn = var.internal_nlb_target_group_arn  # NLB 타겟 그룹 주소
+  target_id       = aws_instance.was_2.id       # 방금 만든 WAS 인스턴스 ID
+  port             = 9000
 }
 
 # -------------------- WAS ALB / Target Group -------------------- #

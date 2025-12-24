@@ -18,8 +18,10 @@ module "instance" {
     web_sg_id           = module.network.web_sg_id
     was_sg_id           = module.network.was_sg_id
 
+    internal_nlb_dns = module.alb_system.internal_nlb_dns
+
     public_alb_target_group_arn  = module.alb_system.public_alb_target_group_arn
-    internal_alb_target_group_arn  = module.alb_system.internal_alb_target_group_arn
+    internal_nlb_target_group_arn  = module.alb_system.internal_nlb_target_group_arn
 }
 
 /*module "rds_database" {
@@ -58,7 +60,7 @@ module "alb_system" {
   ]
 
   public_alb_sg_id   = module.network.public_alb_sg_id
-  internal_alb_sg_id = module.network.internal_alb_sg_id
+  internal_nlb_sg_id = module.network.internal_nlb_sg_id
 
   web_instance_ids = module.instance.web_instance_ids
   was_instance_ids = module.instance.was_instance_ids
