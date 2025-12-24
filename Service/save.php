@@ -16,9 +16,9 @@ $name = addslashes(htmlentities($_POST["name"], ENT_QUOTES));
 
 
 				if($act == "add") {
-					mysqli_query($link, "INSERT INTO `users` (  `user_name` , `password` , `name` ) VALUES ( '".$user_name."' , '".md5($password)."', '".$name."' ) ");
+					mysqli_query($link, "INSERT INTO `users` (  `name` , `password` , `email` ) VALUES ( '".$name."' , '".md5($password)."', '".$email."' ) ");
 				}elseif ($act == "edit") {
-					mysqli_query($link, "UPDATE `users` SET  `user_name` =  '".$user_name."' , `name` =  '".$name."'  WHERE `id` = '".$id."' "); 
+					mysqli_query($link, "UPDATE `users` SET  `name` =  '".$name."' , `email` =  '".$email."'  WHERE `id` = '".$id."' "); 
 					}elseif ($act_get == "delete") {
 						mysqli_query($link, "DELETE FROM `users` WHERE id = '".$id_get."' ");
 					}

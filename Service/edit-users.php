@@ -16,14 +16,14 @@
 						<input name="id" type="hidden" value="<?=$id?>">
 						<input name="act" type="hidden" value="<?=$act?>">
 				
-							<label>User name</label>
-							<input class="form-control" type="text" name="user_name" value="<?=$users['name']?>" /><br>
+							<label>Name</label>
+							<input class="form-control" type="text" name="name" value="<?=$users['name']?>" /><br>
 							
 							<label>Password</label>
 							<input class="form-control" type="text" name="password" value="<?=$users['password']?>" /><br>
 							
-							<label>Name</label>
-							<input class="form-control" type="text" name="name" value="<?=$users['name']?>" /><br>
+							<label>Email</label>
+							<input class="form-control" type="text" name="email" value="<?=$users['email']?>" /><br>
 							<br>
 					<input type="submit" value=" Save " class="btn btn-success">
 					</form>
