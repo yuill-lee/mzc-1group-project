@@ -1,6 +1,13 @@
 <?php
-		$link = mysqli_connect("192.168.65.175", "user01", "user01");
-		mysqli_select_db($link, "test_db");
-		mysqli_query($link, "SET CHARACTER SET utf8");
-		?>
-		
+// 도커 환경 변수를 읽어오고, 없으면 기본값인 'db'를 사용합니다.
+$host = getenv('DB_HOST') ?: 'db'; 
+$user = getenv('DB_USER') ?: 'user01';
+$pass = getenv('DB_PASS') ?: 'user01';
+$dbname = getenv('DB_NAME') ?: 'test_db';
+
+$link = mysqli_connect($host, $user, $pass, $dbname);
+
+if (!$link) {
+    die("DB 연결 실패: " . mysqli_connect_error());
+}
+?>
