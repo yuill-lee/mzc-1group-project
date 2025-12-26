@@ -36,7 +36,7 @@
 				<nav id="sidebar" class="bg-primary">
 					<div class="sidebar-header">
 						<h3>
-							Test_db Admin Panel<br>
+							Test_db Admin Panel23333<br>
 							<i id="sidebarCollapse" class="glyphicon glyphicon-circle-arrow-left"></i>
 						</h3>
 						<strong>
