@@ -24,6 +24,8 @@ services:
       dockerfile: .docker/was/Dockerfile
     container_name: php_was
     restart: always
+    ports:
+    - "9000:9000"
     environment:
       - DB_HOST=db
       - DB_USER=user01
