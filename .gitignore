@@ -12,3 +12,10 @@
 
 # 3. 기타 시스템 파일
 .DS_Store
+
+# MySQL 데이터 폴더 제외
+mysql_data/
+
+# OS 생성 파일 제외
+.DS_Store
+Thumbs.db
