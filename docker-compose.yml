@@ -29,7 +29,7 @@ services:
     environment:
       - DB_HOST=db
       - DB_USER=user01
-      - DB_PASS=user01
+      - DB_PASS=user01password
       - DB_NAME=test_db
     volumes:
       - ./Service:/var/www/html/Service
