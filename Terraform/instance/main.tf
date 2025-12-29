@@ -6,7 +6,10 @@ resource "aws_instance" "bastion_server" {
     subnet_id = var.public_subnet_1_id
     vpc_security_group_ids = [var.bastion_sg_id]
     associate_public_ip_address = true
-
+    user_data = templatefile(
+        "${path.module}/userdata/bastion.tpl", {
+        rds_endpoint = var.rds_endpoint
+    })
     tags = {
         Name = "Bastion-Server"
     }
@@ -22,7 +25,6 @@ resource "aws_instance" "nat_server" {
     source_dest_check = false
     associate_public_ip_address = true
     user_data = file("${path.module}/userdata/nat.sh")
-
     tags = {
         Name = "NAT-Server"
     }
@@ -97,7 +99,11 @@ resource "aws_instance" "was_1" {
     # 1번 WAS는 1번 프라이빗 서브넷에 배치
     subnet_id     = var.private_subnet_1_id
     vpc_security_group_ids = [var.was_sg_id]
-    user_data = file("${path.module}/userdata/was.sh")
+    user_data = templatefile(
+        "${path.module}/userdata/was.tpl", {
+        rds_endpoint = var.rds_endpoint
+        }
+    )
 
     tags = {
         Name = "WAS-Server-1"
@@ -113,7 +119,11 @@ resource "aws_instance" "was_2" {
     # 2번 WAS는 2번 프라이빗 서브넷에 배치
     subnet_id     = var.private_subnet_2_id
     vpc_security_group_ids = [var.was_sg_id]
-    user_data = file("${path.module}/userdata/was.sh")
+    user_data = templatefile(
+        "${path.module}/userdata/was.tpl", {
+        rds_endpoint = var.rds_endpoint
+        }
+    )
 
     tags = {
         Name = "WAS-Server-2"

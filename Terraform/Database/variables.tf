@@ -1,11 +1,7 @@
-# Database/variables.tf
-
-variable "subnet_ids" {
-  description = "RDS가 위치할 서브넷 ID 리스트"
-  type        = list(string)
-}
-
-variable "db_sg_id" {
-  description = "RDS 보안 그룹 ID"
-  type        = string
-}
+variable "vpc_id" {}
+variable "private_subnets" { type = list(string) }
+variable "was_sg_id" {}   # DB SG ID 대신 WAS SG ID를 받음
+variable "db_username" {}
+variable "db_password" {}
+variable "bastion_sg_id" {}
+  

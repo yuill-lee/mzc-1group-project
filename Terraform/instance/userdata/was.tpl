@@ -23,7 +23,7 @@ sudo chmod -R 755 /home/ubuntu/app/Service
 
 # 5. DB IP 설정
 # [중요] DB_IP는 테라폼에서 생성된 실제 DB 프라이빗 IP로 치환되어야 함
-DB_IP="10.0.2.236" 
+DB_IP=${rds_endpoint} 
 
 # 6. [핵심 추가] docker-compose.yml 내의 호스트명을 실제 IP로 변경
 # 이 과정이 있어야 php_network_getaddresses 에러를 방지할 수 있습니다.
@@ -32,6 +32,8 @@ sed -i "s/DB_HOST=db/DB_HOST=$DB_IP/g" /home/ubuntu/app/docker-compose.yml
 # 7. DB 데이터 임포트 (DB 서버가 켜질 때까지 20초 대기)
 sleep 20 
 mysql -h $DB_IP -u user01 -puser01 test_db < /home/ubuntu/app/Service/data.sql
+
+sed -i "s/<DB-ENDPOINT>/$DB_IP/g" /home/ubuntu/app/Service/includes/connect.php
 
 # 8. WAS 컨테이너 실행
 sudo /usr/local/bin/docker-compose up -d was

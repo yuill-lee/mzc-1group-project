@@ -1,26 +1,52 @@
-# Database/main.tf
-
 resource "aws_db_subnet_group" "rds_subnet_group" {
-  name       = "my-rds-subnet-group"
-  subnet_ids = var.subnet_ids # 변수로 받음
+  name       = "mzc-rds-subnet-group"
+  subnet_ids = var.private_subnets 
 
-  tags = {
-    Name = "My DB subnet group"
-  }
+  tags = { Name = "MZC-DB-Subnet-Group" }
 }
 
-resource "aws_db_instance" "default" {
-  allocated_storage   = 20
-  db_name             = "mydb"
-  engine              = "mysql"
-  engine_version      = "8.0"
-  instance_class      = "db.t3.micro"
-  username            = "admin"
-  password            = "password1234"
-  skip_final_snapshot = true
-  backup_retention_period = 1
+# 보안 그룹 만들기 (WAS만 허용)
+resource "aws_security_group" "db_sg" {
+  name        = "mzc-db-sg"
+  vpc_id      = var.vpc_id
 
-  # 네트워크 연결
+  ingress {
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [var.was_sg_id, var.bastion_sg_id]
+  }
+  
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "MZC-DB-SG" }
+}
+
+
+resource "aws_db_instance" "default" {
+  allocated_storage      = 20
+  storage_type           = "gp3"
+  engine                 = "mysql"
+  engine_version         = "8.0"
+  instance_class         = "db.t3.micro"
+  
+  # PHP 코드와 일치
+  db_name                = "test_db"
+  username               = var.db_username
+  password               = var.db_password
+  
+  skip_final_snapshot    = true
+  multi_az               = false
+  publicly_accessible    = false
+
   db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.name
-  vpc_security_group_ids = [var.db_sg_id] # 변수로 받음
+  vpc_security_group_ids = [aws_security_group.db_sg.id]
+
+  tags = { Name = "MZC-MySQL-DB" }
 }

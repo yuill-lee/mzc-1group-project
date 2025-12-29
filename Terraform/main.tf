@@ -22,20 +22,25 @@ module "instance" {
 
     public_alb_target_group_arn  = module.alb_system.public_alb_target_group_arn
     internal_nlb_target_group_arn  = module.alb_system.internal_nlb_target_group_arn
+
+    rds_endpoint = module.rds_database.rds_endpoint
 }
 
-/*module "rds_database" {
+module "rds_database" {
   source = "./Database"
 
-  subnet_ids = [
-    module.network.private_subnet_1_id,
-    module.network.private_subnet_2_id
-  ]
+  vpc_id          = module.network.vpc_id
+  private_subnets = module.network.private_subnets
+  
+  was_sg_id       = module.network.was_sg_id
+  bastion_sg_id   = module.network.bastion_sg_id 
 
-  db_sg_id = module.network.db_sg_id
+  db_username     = "user01"
+  db_password     = "user01password"
+  
 }
 
-module "sub_region" {
+/*module "sub_region" {
   source = "./tokyo"
 
   providers = {

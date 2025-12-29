@@ -21,6 +21,13 @@ output "private_subnet_2_id" {
     value = aws_subnet.priv_2.id
 }
 
+output "private_subnets" {
+  value = [
+    aws_subnet.priv_1.id,
+    aws_subnet.priv_2.id
+  ]
+}
+
 output "web_sg_id" {
     value = aws_security_group.web_sg.id
 }
@@ -48,3 +55,4 @@ output "public_alb_sg_id" {
 output "internal_nlb_sg_id" {
     value = aws_security_group.internal_nlb_sg.id
 }
+
