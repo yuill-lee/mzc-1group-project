@@ -40,7 +40,7 @@ module "rds_database" {
   
 }
 
-/*module "sub_region" {
+module "sub_region" {
   source = "./tokyo"
 
   providers = {
@@ -48,7 +48,7 @@ module "rds_database" {
   }
 
   seoul_db_arn = module.rds_database.rds_arn
-}*/
+}
 
 module "alb_system" {
   source = "./alb"
