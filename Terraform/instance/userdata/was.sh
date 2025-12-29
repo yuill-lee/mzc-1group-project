@@ -1,31 +1,37 @@
 #!/bin/bash
+# 1. SSH 설정
 # Turn on password authentication
 echo 'ubuntu:hackers' | sudo chpasswd
 sudo sed -i 's/Include/#Include/g' /etc/ssh/sshd_config
 sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config
 sudo systemctl restart ssh
 
-# 1. PHP 8.3 및 필수 모듈 설치
+# 2. 도커 및 도커 컴포즈 설치
 sudo apt-get update -y
-sudo apt-get install -y php8.3-fpm php8.3-mysql php8.3-mbstring php8.3-gd php8.3-curl mysql-client git
+sudo apt-get install -y docker.io git mysql-client
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+sudo systemctl start docker
 
-# 2. PHP-FPM 네트워크 설정 (503 에러 방지의 핵심)
-# 9000번 포트 리스닝 및 접근 제한 완전히 해제 (주석 처리)
-sudo sed -i 's/^listen = .*/listen = 0.0.0.0:9000/' /etc/php/8.3/fpm/pool.d/www.conf
-sudo sed -i 's/^listen.allowed_clients = /;listen.allowed_clients = /' /etc/php/8.3/fpm/pool.d/www.conf
-sudo systemctl restart php8.3-fpm
+# 3. 프로젝트 클론
+mkdir -p /home/ubuntu/app
+cd /home/ubuntu/app
+git clone -b main https://github.com/yuill-lee/mzc-1group-project.git .
 
-# 3. 소스 코드 가져오기 (경로 중첩 방지를 위해 현재 디렉토리에 클론)
-sudo mkdir -p /var/www/html
-cd /var/www/html
-sudo git clone -b main https://github.com/yuill-lee/mzc-1group-project.git .
+# 4. 권한 설정
+sudo chmod -R 755 /home/ubuntu/app/Service
 
-# 4. DB 접속 정보 수정 (오타 방지 및 실제 DB IP 반영)
+# 5. DB IP 설정
 # [중요] DB_IP는 테라폼에서 생성된 실제 DB 프라이빗 IP로 치환되어야 함
 DB_IP="10.0.2.236" 
-TARGET_FILE="/var/www/html/Service/includes/connect.php"
-sudo sed -i "s/mysqli_connect([\"'][^\"']*[\"'], [\"'][^\"']*[\"'], [\"'][^\"']*[\"'])/mysqli_connect(\"$DB_IP\", \"user01\", \"user01\")/g" $TARGET_FILE
 
-# 5. 권한 설정 및 데이터 임포트
-sudo chown -R www-data:www-data /var/www/html
-sudo mysql -h $DB_IP -u user01 -puser01 test_db < /var/www/html/Service/data.sql
+# 6. [핵심 추가] docker-compose.yml 내의 호스트명을 실제 IP로 변경
+# 이 과정이 있어야 php_network_getaddresses 에러를 방지할 수 있습니다.
+sed -i "s/DB_HOST=db/DB_HOST=$DB_IP/g" /home/ubuntu/app/docker-compose.yml
+
+# 7. DB 데이터 임포트 (DB 서버가 켜질 때까지 20초 대기)
+sleep 20 
+mysql -h $DB_IP -u user01 -puser01 test_db < /home/ubuntu/app/Service/data.sql
+
+# 8. WAS 컨테이너 실행
+sudo /usr/local/bin/docker-compose up -d was

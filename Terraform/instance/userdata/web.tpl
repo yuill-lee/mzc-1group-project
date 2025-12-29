@@ -1,47 +1,33 @@
 #!/bin/bash
+# 1. SSH 설정
 # Turn on password authentication
 echo 'ubuntu:hackers' | sudo chpasswd
 sudo sed -i 's/Include/#Include/g' /etc/ssh/sshd_config
 sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config
 sudo systemctl restart ssh
 
-# 1. Apache 설치 및 프록시 모듈 활성화
+# 2. 도커 및 도커 컴포즈 설치
 sudo apt-get update -y
-sudo apt-get install -y apache2 git
-sudo a2enmod proxy proxy_fcgi
-sudo systemctl restart apache2
+sudo apt-get install -y docker.io git
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+sudo systemctl start docker
 
-# 2. 정적 파일(CSS)만 가져오기 (Sparse Checkout)
-sudo mkdir -p /var/www/html
-cd /var/www/html
-sudo git init
-sudo git remote add origin https://github.com/yuill-lee/mzc-1group-project.git
-sudo git config core.sparseCheckout true
-sudo echo "Service/includes/style.css" >> .git/info/sparse-checkout
-sudo echo "Service/library/style.css" >> .git/info/sparse-checkout
-sudo git pull origin main
+# 3. 프로젝트 클론
+mkdir -p /home/ubuntu/app
+cd /home/ubuntu/app
+git clone -b main https://github.com/yuill-lee/mzc-1group-project.git .
 
-# 3. Apache VirtualHost 설정 (WAS IP 주입)
+# 4. WAS IP 설정
 # [중요] WAS_IP는 테라폼에서 생성된 실제 WAS 프라이빗 IP로 치환되어야 함
 WAS_IP="${WAS_IP}"
-sudo cat <<EOF > /etc/apache2/sites-available/000-default.conf
-<VirtualHost *:80>
-    DocumentRoot /var/www/html/Service
-    DirectoryIndex index.php index.html
 
-    <Directory /var/www/html/Service>
-        Options Indexes FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>
+# 5. [핵심 수정] 아파치 설정 파일에서 'was:9000' 또는 기존 IP를 현재 WAS IP로 변경
+sed -i "s/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}:9000/$WAS_IP:9000/g" /home/ubuntu/app/.docker/web/my-httpd.conf
+sed -i "s/was:9000/$WAS_IP:9000/g" /home/ubuntu/app/.docker/web/my-httpd.conf
 
-    # PHP 요청 전달 (루트 및 전체 php 경로)
-    ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://${WAS_IP}:9000/var/www/html/Service/\$1
-    ProxyPassMatch ^/$ fcgi://${WAS_IP}:9000/var/www/html/Service/index.php
+# 6. 아파치 권한 에러(403) 해결
+sudo chmod -R 755 /home/ubuntu/app/Service
 
-    ErrorLog $${APACHE_LOG_DIR}/error.log
-    CustomLog $${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
-EOF
-
-sudo systemctl restart apache2
+# 7. Web 컨테이너 실행
+sudo /usr/local/bin/docker-compose up -d web
