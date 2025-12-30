@@ -23,11 +23,15 @@ module "instance" {
     public_alb_target_group_arn  = module.alb_system.public_alb_target_group_arn
     internal_nlb_target_group_arn  = module.alb_system.internal_nlb_target_group_arn
 
-    rds_endpoint = module.rds_database.rds_endpoint
+    rds_endpoint = module.database.rds_endpoint
 }
 
 module "database" {
   source = "./database"
+  providers = {
+    aws = aws
+    aws.tokyo = aws.tokyo
+  }
 
   vpc_id          = module.network.vpc_id
   private_subnets = module.network.private_subnets
