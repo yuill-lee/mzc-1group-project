@@ -1,7 +1,7 @@
 output "rds_endpoint" {
-  value = aws_db_instance.default.address
+	value = module.route53.rds_endpoint
 }
 
-output "rds_arn"{
-  value = aws_db_instance.default.arn
+output "rds_arn_seoul_master" {
+	value = module.seoul_master.rds_arn_seoul_master
 }

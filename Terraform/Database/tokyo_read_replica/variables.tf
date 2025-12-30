@@ -1,0 +1,1 @@
+variable "rds_arn_seoul_master" { type = string }

@@ -33,7 +33,7 @@ resource "aws_db_subnet_group" "tokyo_db_group" {
 
 # 4. 도쿄 RDS
 resource "aws_db_instance" "tokyo_db" {
-  replicate_source_db    = var.seoul_db_arn
+  replicate_source_db    = var.rds_arn_seoul_master
   engine                 = "mysql"
   instance_class         = "db.t3.micro"
   skip_final_snapshot    = true

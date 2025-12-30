@@ -26,28 +26,18 @@ module "instance" {
     rds_endpoint = module.rds_database.rds_endpoint
 }
 
-module "rds_database" {
-  source = "./Database"
+module "database" {
+  source = "./database"
 
   vpc_id          = module.network.vpc_id
   private_subnets = module.network.private_subnets
   
   was_sg_id       = module.network.was_sg_id
   bastion_sg_id   = module.network.bastion_sg_id 
+  db_sg_id = module.network.db_sg_id
 
   db_username     = "user01"
   db_password     = "user01password"
-  
-}
-
-module "sub_region" {
-  source = "./tokyo"
-
-  providers = {
-    aws = aws.tokyo
-  }
-
-  seoul_db_arn = module.rds_database.rds_arn
 }
 
 module "alb_system" {
@@ -66,7 +56,4 @@ module "alb_system" {
 
   public_alb_sg_id   = module.network.public_alb_sg_id
   internal_nlb_sg_id = module.network.internal_nlb_sg_id
-
-  web_instance_ids = module.instance.web_instance_ids
-  was_instance_ids = module.instance.was_instance_ids
 }

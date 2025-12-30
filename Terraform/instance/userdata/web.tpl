@@ -29,5 +29,13 @@ sed -i "s/was:9000/$WAS_IP:9000/g" /home/ubuntu/app/.docker/web/my-httpd.conf
 # 6. 아파치 권한 에러(403) 해결
 sudo chmod -R 755 /home/ubuntu/app/Service
 
+cat <<EOF > /home/ubuntu/app/docker-compose.override.yml
+version: '3'
+services:
+  web:
+    ports:
+      - "80:80"
+EOF
+
 # 7. Web 컨테이너 실행
 sudo /usr/local/bin/docker-compose up -d web

@@ -1,53 +1,21 @@
-resource "aws_db_subnet_group" "rds_subnet_group" {
-  name       = "mzc-rds-subnet-group"
-  subnet_ids = var.private_subnets 
+module "route53" {
+  source = "./route53"
 
-  tags = { Name = "MZC-DB-Subnet-Group" }
+  rds_endpoint = module.seoul_master.rds_endpoint_seoul_master
 }
 
-# 보안 그룹 만들기 (WAS만 허용)
-resource "aws_security_group" "db_sg" {
-  name        = "mzc-db-sg"
-  vpc_id      = var.vpc_id
+module "seoul_master" {
+  source = "./seoul_master"
 
-  ingress {
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    security_groups = [var.was_sg_id, var.bastion_sg_id]
-  }
-  
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = { Name = "MZC-DB-SG" }
+  db_username = var.db_username
+  db_password = var.db_password
+  private_subnets = var.private_subnets
+  db_sg_id = var.db_sg_id
 }
 
+module "tokyo_read_replica" {
+  source = "./tokyo_read_replica"
+  providers = { aws = aws.tokyo }
 
-resource "aws_db_instance" "default" {
-  allocated_storage      = 20
-  storage_type           = "gp3"
-  engine                 = "mysql"
-  engine_version         = "8.0"
-  instance_class         = "db.t3.micro"
-  
-  # PHP 코드와 일치
-  db_name                = "test_db"
-  username               = var.db_username
-  password               = var.db_password
-  
-  skip_final_snapshot    = true
-  multi_az               = false
-  publicly_accessible    = false
-
-  db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.name
-  vpc_security_group_ids = [aws_security_group.db_sg.id]
-  backup_retention_period = 7
-
-  tags = { Name = "MZC-MySQL-DB" }
+  rds_arn_seoul_master = module.seoul_master.rds_arn_seoul_master
 }

@@ -30,14 +30,6 @@ resource "aws_lb_listener" "public_listener" {
   }
 }
 
-# WEB 인스턴스 연결
-resource "aws_lb_target_group_attachment" "web_attach" {
-  count            = length(var.web_instance_ids)
-  target_group_arn = aws_lb_target_group.public_alb_target_group.arn
-  target_id        = var.web_instance_ids[count.index]
-  port             = 80
-}
-
 # ============================================================
 # 2. Internal Load Balancer (WEB -> WAS)
 # ============================================================
@@ -75,12 +67,4 @@ resource "aws_lb_listener" "internal_listener" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.internal_nlb_target_group.arn
   }
-}
-
-# WAS 인스턴스 연결
-resource "aws_lb_target_group_attachment" "was_attach" {
-  count            = length(var.was_instance_ids)
-  target_group_arn = aws_lb_target_group.internal_nlb_target_group.arn
-  target_id        = var.was_instance_ids[count.index]
-  port             = 9000
 }
