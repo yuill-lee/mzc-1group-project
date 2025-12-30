@@ -3,44 +3,7 @@ networks:
   mzc-final-net:
     driver: bridge
 services:
-<<<<<<< HEAD
   # [Entry Point & Load Balancer] Apache
-=======
-  # 1. DB 서버 (별도 Dockerfile 없이 공식 이미지 사용)
-  db:
-    image: mysql:8.0
-    container_name: mysql_db
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: hackers
-      MYSQL_DATABASE: test_db
-      MYSQL_USER: user01
-      MYSQL_PASSWORD: user01
-    ports:
-      - "3306:3306"
-    volumes:
-      - ./mysql_data:/var/lib/mysql
-      - ./data.sql:/docker-entrypoint-initdb.d/data.sql # 초기 데이터 자동 로드
-
-  # 2. WAS 서버 (PHP 8.3)
-  was:
-    build: 
-      context: .
-      dockerfile: .docker/was/Dockerfile
-    container_name: php_was
-    restart: always
-    ports:
-    - "9000:9000"
-    environment:
-      - DB_HOST=db
-      - DB_USER=user01
-      - DB_PASS=user01password
-      - DB_NAME=test_db
-    volumes:
-      - ./Service:/var/www/html/Service
-
-  # 3. WEB 서버 (Apache)
->>>>>>> 7179fb69f3d6c88e3f16f3940d23c6fe31e05f9b
   web:
     build:
       context: .
@@ -48,7 +11,7 @@ services:
     container_name: apache_lb
     restart: always
     ports:
-      - "80:80" # http://127.0.0.1 접속 수신
+      - "80:80"       # http://127.0.0.1 접속 수신
     volumes:
       - ./Service:/var/www/html/Service
     networks:
@@ -69,15 +32,10 @@ services:
   # [Database] MySQL
   db:
     image: mysql:8.0
-    container_name: db
+    container_name: mysql_db
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=user01password
-      - MYSQL_DATABASE=test_db
-      - MYSQL_USER=user01 # [추가] PHP가 사용하는 사용자
-      - MYSQL_PASSWORD=user01password # [추가] PHP가 사용하는 비밀번호
-    volumes:
-      # 로컬의 data.sql 파일을 컨테이너의 초기화 폴더로 연결합니다.
-      - "./data.sql:/docker-entrypoint-initdb.d/data.sql"
+      MYSQL_ROOT_PASSWORD: hackers
+      MYSQL_DATABASE: test_db
     networks:
       - mzc-final-net

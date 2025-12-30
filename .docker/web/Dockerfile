@@ -11,7 +11,7 @@ RUN echo "Include conf/extra/my-httpd.conf" >> /usr/local/apache2/conf/httpd.con
 RUN mkdir -p /var/www/html/Service && \
     chown -R daemon:daemon /var/www/html && \
     chmod -R 755 /var/www/html
-# 로드밸런싱 및 프록시 관련 필수 모듈 활성화
+    # 로드밸런싱 및 프록시 관련 필수 모듈 활성화
 RUN sed -i \
     -e 's/^#\(LoadModule proxy_module modules\/mod_proxy.so\)/\1/' \
     -e 's/^#\(LoadModule proxy_fcgi_module modules\/mod_proxy_fcgi.so\)/\1/' \

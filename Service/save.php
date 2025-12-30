@@ -3,13 +3,11 @@ include("includes/connect.php");
 
 // 1. 모든 Undefined array key 에러 방지
 $cat     = $_POST['cat'] ?? $_GET['cat'] ?? '';
-$cat_get = $_GET['cat'] ?? '';
 $act     = $_POST['act'] ?? $_GET['act'] ?? '';
-$act_get = $_GET['act'] ?? '';
 $id      = $_POST['id'] ?? $_GET['id'] ?? '';
-$id_get  = $_GET['id'] ?? '';
 
-if($cat == "users" || $cat_get == "users") {
+
+if($cat == "users" ) {
     // 2. 보안 기능 없이 변수만 할당 (Warning 방지)
     $password  = $_POST["password"] ?? '';
     $name      = $_POST["name"] ?? '';
@@ -23,8 +21,8 @@ if($cat == "users" || $cat_get == "users") {
     } elseif ($act == "edit") {
         mysqli_query($link, "UPDATE `users` SET `name` = '$name', `email` = '$email' WHERE `id` = '$id'"); 
         
-    } elseif ($act_get == "delete") {
-        mysqli_query($link, "DELETE FROM `users` WHERE id = '$id_get'");
+    } elseif ($act == "delete") {
+        mysqli_query($link, "DELETE FROM `users` WHERE id = '$id'");
     }
 
     header("location: users.php");
