@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service # [외부 노출용]
+metadata:
+  name: web-service
+spec:
+  selector:
+    app: web
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    nodePort: 30080 # [외부 포트] AWS ALB(로드밸런서)가 이 포트로 트래픽을 보냅니다.
+  type: NodePort # 외부에서 EC2 IP:30080으로 접속 가능하게 엽니다.

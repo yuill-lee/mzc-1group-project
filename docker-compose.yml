@@ -1,47 +1,53 @@
 version: '3.8'
 
 services:
-  # 1. DB 서버 (별도 Dockerfile 없이 공식 이미지 사용)
-  db:
-    image: mysql:8.0
-    container_name: mysql_db
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: hackers
-      MYSQL_DATABASE: test_db
-      MYSQL_USER: user01
-      MYSQL_PASSWORD: user01
-    ports:
-      - "3306:3306"
-    volumes:
-      - ./mysql_data:/var/lib/mysql
-      - ./data.sql:/docker-entrypoint-initdb.d/data.sql # 초기 데이터 자동 로드
-
-  # 2. WAS 서버 (PHP 8.3)
-  was:
-    build: 
-      context: .
-      dockerfile: .docker/was/Dockerfile
-    container_name: php_was
-    restart: always
-    ports:
-    - "9000:9000"
-    environment:
-      - DB_HOST=db
-      - DB_USER=user01
-      - DB_PASS=user01password
-      - DB_NAME=test_db
-    volumes:
-      - ./Service:/var/www/html/Service
-
-  # 3. WEB 서버 (Apache)
+  # [WEB 서버] Apache
   web:
     build:
       context: .
-      dockerfile: .docker/web/Dockerfile
-    container_name: apache_web
-    restart: always
+      dockerfile: .docker/web/Dockerfile # 이 경로의 도커파일로 이미지를 만듭니다.
     ports:
-      - "80:80"
+      - "80:80" # 내 컴퓨터 80포트 -> 컨테이너 80포트 연결
     volumes:
-      - ./Service:/var/www/html/Service
+      - ./Service:/var/www/html/Service # [중요] 소스코드를 수정하면 즉시 반영되도록 연결 (마운트)
+    depends_on:
+      - was # WAS가 켜진 뒤에 실행
+    networks:
+      - app-network
+
+  # [WAS 서버] PHP-FPM
+  was:
+    build:
+      context: .
+      dockerfile: .docker/was/Dockerfile
+    hostname: was # [핵심] 로컬에서도 K8s처럼 'was'라는 이름으로 통신하기 위해 호스트명 고정
+    volumes:
+      - ./Service:/var/www/html/Service # WEB과 동일한 소스코드를 바라봄
+    environment:
+      # 로컬 DB 접속 정보 (connect.php가 이 값을 읽음)
+      DB_HOST: db
+      DB_USER: user01
+      DB_PASS: user01password
+      DB_NAME: test_db
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  # [DB 서버] MySQL
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: test_db
+      MYSQL_USER: user01
+      MYSQL_PASSWORD: user01password
+    volumes:
+      # [편의성] 컨테이너 실행 시 data.sql을 자동으로 실행해 테이블과 데이터를 만듦
+      - ./data.sql:/docker-entrypoint-initdb.d/data.sql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

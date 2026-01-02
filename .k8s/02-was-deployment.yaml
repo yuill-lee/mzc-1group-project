@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment # [배포 관리자] 파드를 생성하고 관리합니다.
+metadata:
+  name: was-deployment
+  labels:
+    app: was
+spec:
+  replicas: 2 # [기본 수량] 평소에는 2개를 유지합니다.
+  selector:
+    matchLabels:
+      app: was
+  template:
+    metadata:
+      labels:
+        app: was
+    spec:
+      containers:
+      - name: was
+        # [자동 치환 대상] UserData가 'uil9308'로 바꿉니다.
+        image: DOCKERHUB_USER_PLACEHOLDER/mzc-was:latest
+        ports:
+        - containerPort: 9000
+        
+        # [DB 정보 주입] Secret에 저장된 정보를 환경변수로 가져옵니다.
+        envFrom:
+        - secretRef:
+            name: db-secret
+            
+        # [오토스케일링 필수 조건]
+        # HPA가 작동하려면 CPU를 얼마나 쓰는지 기준이 필요합니다.
+        resources:
+          requests:
+            cpu: "200m"     # 최소 0.2 코어 예약
+            memory: "256Mi"
+          limits:
+            cpu: "500m"     # 최대 0.5 코어까지만 사용 가능 (넘으면 제한)
+            memory: "512Mi"

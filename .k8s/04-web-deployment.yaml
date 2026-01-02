@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-deployment
+  labels:
+    app: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: web
+        # [자동 치환 대상] UserData가 'uil9308'로 바꿉니다.
+        image: DOCKERHUB_USER_PLACEHOLDER/mzc-web:latest
+        ports:
+        - containerPort: 80
+        
+        # [오토스케일링 기준]
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "300m"
+            memory: "256Mi"
