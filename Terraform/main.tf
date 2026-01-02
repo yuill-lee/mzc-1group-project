@@ -10,6 +10,7 @@ module "database" {
     seoul_db_sg_id = module.seoul.db_sg_id
 
     tokyo_private_subnets = module.tokyo.private_subnets
+    tokyo_db_sg_id = module.tokyo.db_sg_id
 
     db_username     = "user01"
     db_password     = "user01password"

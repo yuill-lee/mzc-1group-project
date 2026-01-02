@@ -20,4 +20,5 @@ module "tokyo_read_replica" {
 
     rds_arn_seoul_master = module.seoul_master.rds_arn_seoul_master
     tokyo_private_subnets = var.tokyo_private_subnets
+    tokyo_db_sg_id = var.tokyo_db_sg_id
 }

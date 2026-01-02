@@ -1,9 +1,9 @@
 terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
+    required_providers {
+        aws = {
+            source  = "hashicorp/aws"
+        }
     }
-  }
 }
 
 # DB 서브넷 그룹
@@ -20,4 +20,6 @@ resource "aws_db_instance" "tokyo_db" {
     skip_final_snapshot    = true
     
     db_subnet_group_name   = aws_db_subnet_group.tokyo_db_group.name
+    vpc_security_group_ids = [var.tokyo_db_sg_id]
+
 }
