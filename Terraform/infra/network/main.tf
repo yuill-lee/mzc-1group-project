@@ -1,6 +1,6 @@
 # -------------------- VPC -------------------- #
 resource "aws_vpc" "vpc" {
-    cidr_block = "10.0.0.0/16"
+    cidr_block = var.vpc_cidr
     
     tags = {
         Name = "Final-Project-VPC"
@@ -23,7 +23,7 @@ data "aws_availability_zones" "az" {
 
 resource "aws_subnet" "pub_1" {
     vpc_id = aws_vpc.vpc.id
-    cidr_block = "10.0.1.0/24"
+    cidr_block = var.public_subnet_1_cidr
     availability_zone = data.aws_availability_zones.az.names[0]
 
     tags = {
@@ -33,7 +33,7 @@ resource "aws_subnet" "pub_1" {
 
 resource "aws_subnet" "pub_2" {
     vpc_id = aws_vpc.vpc.id
-    cidr_block = "10.0.2.0/24"
+    cidr_block = var.public_subnet_2_cidr
     availability_zone = data.aws_availability_zones.az.names[1]
 
     tags = {
@@ -43,7 +43,7 @@ resource "aws_subnet" "pub_2" {
 
 resource "aws_subnet" "priv_1" {
     vpc_id = aws_vpc.vpc.id
-    cidr_block = "10.0.11.0/24"
+    cidr_block = var.private_subnet_1_cidr
     availability_zone = data.aws_availability_zones.az.names[0]
 
     tags = {
@@ -53,7 +53,7 @@ resource "aws_subnet" "priv_1" {
 
 resource "aws_subnet" "priv_2" {
     vpc_id = aws_vpc.vpc.id
-    cidr_block = "10.0.12.0/24"
+    cidr_block = var.private_subnet_2_cidr
     availability_zone = data.aws_availability_zones.az.names[1]
 
     tags = {

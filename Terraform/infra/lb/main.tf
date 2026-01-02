@@ -43,7 +43,6 @@ resource "aws_lb" "internal_nlb" {
   tags = { Name = "Internal-NLB" }
 }
 
-
 resource "aws_lb_target_group" "internal_nlb_target_group" {
   name     = "was-target-group"
   port     = 9000   

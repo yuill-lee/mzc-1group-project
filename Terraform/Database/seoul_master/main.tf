@@ -1,6 +1,6 @@
 resource "aws_db_subnet_group" "rds_subnet_group" {
   name       = "rds-subnet-group"
-  subnet_ids = var.private_subnets 
+  subnet_ids = var.seoul_private_subnets 
 
   tags = { Name = "DB-Subnet-Group" }
 }
@@ -22,7 +22,7 @@ resource "aws_db_instance" "rds_database_seoul_master" {
   publicly_accessible    = false
 
   db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.name
-  vpc_security_group_ids = [var.db_sg_id]
+  vpc_security_group_ids = [var.seoul_db_sg_id]
   backup_retention_period = 7
 
   tags = { Name = "MZC-MySQL-DB" }

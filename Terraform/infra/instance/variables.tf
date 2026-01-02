@@ -14,14 +14,7 @@ variable "internal_nlb_dns" { type = string }
 variable "public_alb_target_group_arn" { type = string }
 variable "internal_nlb_target_group_arn" {  type = string }
 
+variable "key_pair" { type = string }
+variable "ubuntu_ami" { type = string }
+variable "amazon_linux_2_ami" { type = string }
 variable "rds_endpoint" {type = string }
-
-variable "ubuntu_ami_seoul" {
-    type = string
-    default = "ami-0a71e3eb8b23101ed"
-}
-
-variable "amazon_linux_2_ami_seoul" {
-    type = string
-    default = "ami-013c951bfeb5d9c3b"
-}

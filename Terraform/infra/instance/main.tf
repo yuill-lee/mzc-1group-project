@@ -1,8 +1,8 @@
 # -------------------- Bastion Server -------------------- #
 resource "aws_instance" "bastion_server" {
     instance_type = "t3.micro"
-    ami = var.ubuntu_ami_seoul
-    key_name = "Final-Project-Key"
+    ami = var.ubuntu_ami
+    key_name = var.key_pair
     subnet_id = var.public_subnet_1_id
     vpc_security_group_ids = [var.bastion_sg_id]
     associate_public_ip_address = true
@@ -19,8 +19,8 @@ resource "aws_instance" "bastion_server" {
 # -------------------- NAT Server -------------------- #
 resource "aws_instance" "nat_server" {
     instance_type = "t3.micro"
-    ami = var.amazon_linux_2_ami_seoul
-    key_name = "Final-Project-Key"
+    ami = var.amazon_linux_2_ami
+    key_name = var.key_pair
     subnet_id = var.public_subnet_1_id
     vpc_security_group_ids = [var.nat_sg_id]
     source_dest_check = false
@@ -35,9 +35,9 @@ resource "aws_instance" "nat_server" {
 # -------------------- WEB Launch Template -------------------- #
 resource "aws_launch_template" "web_template" {
   name_prefix   = "web-template-"
-  image_id      = var.ubuntu_ami_seoul
+  image_id      = var.ubuntu_ami
   instance_type = "t3.micro"
-  key_name      = "Final-Project-Key"
+  key_name      = var.key_pair
 
   # 네트워크 설정 (보안 그룹 등)
   network_interfaces {
@@ -64,9 +64,9 @@ resource "aws_launch_template" "web_template" {
 # -------------------- WAS Launch Template -------------------- #
 resource "aws_launch_template" "was_template" {
   name_prefix   = "was-template-"
-  image_id      = var.ubuntu_ami_seoul
+  image_id      = var.ubuntu_ami
   instance_type = "t3.micro"
-  key_name      = "Final-Project-Key"
+  key_name      = var.key_pair
 
   network_interfaces {
     associate_public_ip_address = false # WAS는 프라이빗이므로 Public IP X
